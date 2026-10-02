@@ -45,21 +45,19 @@ days.forEach(day => {
         </div>
     `;
 
-    timetable.appendChild(
-        daySection
-    );
+    timetable.appendChild(daySection);
+
 
     const slotContainer =
         document.getElementById(
             `${day}-slots`
         );
 
+
     timeSlots.forEach(time => {
 
         const slot =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
         slot.className =
             "slot";
@@ -73,6 +71,7 @@ days.forEach(day => {
         slot.dataset.time =
             time;
 
+
         slot.addEventListener(
             "click",
             function () {
@@ -85,6 +84,7 @@ days.forEach(day => {
 
             }
         );
+
 
         slotContainer.appendChild(
             slot
@@ -104,7 +104,9 @@ function getFreeTime(day) {
             `.slot[data-day="${day}"].selected`
         );
 
+
     const selectedTimes = [];
+
 
     selectedSlots.forEach(slot => {
 
@@ -114,6 +116,7 @@ function getFreeTime(day) {
 
     });
 
+
     const freeTimes =
         timeSlots.filter(
             time =>
@@ -122,10 +125,13 @@ function getFreeTime(day) {
                 )
         );
 
+
     return freeTimes.join(", ");
 
 }
 
+
+/* ================= CALCULATE FREE TIME ================= */
 
 function calculateFreeTime() {
 
@@ -134,25 +140,34 @@ function calculateFreeTime() {
             "freeTime"
         );
 
+
+    if (!freeTimeDiv) {
+        return;
+    }
+
+
     freeTimeDiv.innerHTML = "";
+
 
     days.forEach(day => {
 
         const freeTimes =
             getFreeTime(day);
 
+
         const dayDiv =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
+
 
         dayDiv.className =
             "free-day";
+
 
         dayDiv.innerHTML = `
             <strong>${day}</strong>
             ${freeTimes || "No free time"}
         `;
+
 
         freeTimeDiv.appendChild(
             dayDiv
@@ -175,12 +190,15 @@ submitBtn.addEventListener(
     "click",
     async function () {
 
-        if (
-            submitBtn.disabled
-        ) {
+
+        /* Prevent double click */
+
+        if (submitBtn.disabled) {
             return;
         }
 
+
+        /* ================= GET FORM DATA ================= */
 
         const name =
             document
@@ -225,7 +243,6 @@ submitBtn.addEventListener(
             );
 
             return;
-
         }
 
 
@@ -236,7 +253,6 @@ submitBtn.addEventListener(
             );
 
             return;
-
         }
 
 
@@ -247,7 +263,6 @@ submitBtn.addEventListener(
             );
 
             return;
-
         }
 
 
@@ -258,11 +273,10 @@ submitBtn.addEventListener(
             );
 
             return;
-
         }
 
 
-        /* ================= DISABLE ================= */
+        /* ================= DISABLE BUTTON ================= */
 
         submitBtn.disabled =
             true;
@@ -271,7 +285,7 @@ submitBtn.addEventListener(
             "Submitting...";
 
 
-        /* ================= DATA ================= */
+        /* ================= COLLECT DATA ================= */
 
         const data = {
 
@@ -300,7 +314,7 @@ submitBtn.addEventListener(
         };
 
 
-        /* ================= SEND ================= */
+        /* ================= SEND TO GOOGLE SHEET ================= */
 
         try {
 
@@ -337,16 +351,18 @@ submitBtn.addEventListener(
                 submitBtn.disabled =
                     false;
 
+
                 submitBtn.innerText =
                     "Submit Availability";
+
 
                 alert(
                     "This Student ID has already submitted.\n\n" +
                     "One Student ID can submit only once."
                 );
 
-                return;
 
+                return;
             }
 
 
@@ -359,23 +375,30 @@ submitBtn.addEventListener(
                 submitBtn.innerText =
                     "Submitted ✓";
 
+
                 submitBtn.style.background =
                     "#16a34a";
 
+
                 showSuccessMessage();
 
+
                 /*
-                 * IMPORTANT:
-                 * Clear all student information
-                 * AND all selected time slots.
+                 * Clear everything after successful submission.
                  */
 
                 resetForm();
 
-                startCountdown();
+
+                /*
+                 * Keep button disabled after submission.
+                 */
+
+                submitBtn.disabled =
+                    true;
+
 
                 return;
-
             }
 
 
@@ -387,22 +410,32 @@ submitBtn.addEventListener(
 
         }
 
+
+        /* ================= ERROR ================= */
+
         catch (error) {
 
             console.error(
                 error
             );
 
+
             alert(
                 "Submission failed.\n\n" +
                 error.message
             );
 
+
             submitBtn.disabled =
                 false;
 
+
             submitBtn.innerText =
                 "Submit Availability";
+
+
+            submitBtn.style.background =
+                "";
 
         }
 
@@ -410,46 +443,73 @@ submitBtn.addEventListener(
 );
 
 
-/* ================= COUNTDOWN ================= */
+/* ================= RESET FORM ================= */
 
-function startCountdown() {
+function resetForm() {
 
-    let seconds = 10;
+    /* Clear student information */
 
-    submitBtn.disabled =
-        true;
+    const nameInput =
+        document.getElementById("name");
 
-    const timer =
-        setInterval(
-            function () {
+    const studentIdInput =
+        document.getElementById("studentId");
 
-                submitBtn.innerText =
-                    `Submitted ✓ (${seconds}s)`;
+    const departmentInput =
+        document.getElementById("department");
 
-                seconds--;
+    const phoneInput =
+        document.getElementById("phone");
 
-                if (
-                    seconds < 0
-                ) {
+    const noteInput =
+        document.getElementById("note");
 
-                    clearInterval(
-                        timer
-                    );
 
-                    submitBtn.disabled =
-                        false;
+    if (nameInput) {
+        nameInput.value = "";
+    }
 
-                    submitBtn.innerText =
-                        "Submit Availability";
 
-                    submitBtn.style.background =
-                        "";
+    if (studentIdInput) {
+        studentIdInput.value = "";
+    }
 
-                }
 
-            },
-            1000
+    if (departmentInput) {
+        departmentInput.value = "";
+    }
+
+
+    if (phoneInput) {
+        phoneInput.value = "";
+    }
+
+
+    if (noteInput) {
+        noteInput.value = "";
+    }
+
+
+    /* ================= CLEAR SELECTED TIME SLOTS ================= */
+
+    const allSlots =
+        document.querySelectorAll(
+            ".slot"
         );
+
+
+    allSlots.forEach(slot => {
+
+        slot.classList.remove(
+            "selected"
+        );
+
+    });
+
+
+    /* ================= REFRESH AVAILABLE TIME ================= */
+
+    calculateFreeTime();
 
 }
 
@@ -463,62 +523,13 @@ function showSuccessMessage() {
             "successModal"
         );
 
+
     if (modal) {
 
         modal.style.display =
             "flex";
 
     }
-
-}
-
-
-/* ================= RESET ================= */
-
-function resetForm() {
-
-    /* Clear student information */
-
-    document.getElementById(
-        "name"
-    ).value = "";
-
-    document.getElementById(
-        "studentId"
-    ).value = "";
-
-    document.getElementById(
-        "department"
-    ).value = "";
-
-    document.getElementById(
-        "phone"
-    ).value = "";
-
-    document.getElementById(
-        "note"
-    ).value = "";
-
-
-    /* Clear ALL selected time slots */
-
-    const selectedSlots =
-        document.querySelectorAll(
-            ".slot.selected"
-        );
-
-    selectedSlots.forEach(
-        slot => {
-            slot.classList.remove(
-                "selected"
-            );
-        }
-    );
-
-
-    /* Refresh "Your Available Time" */
-
-    calculateFreeTime();
 
 }
 
@@ -531,6 +542,7 @@ function closeModal() {
         document.getElementById(
             "successModal"
         );
+
 
     if (modal) {
 
