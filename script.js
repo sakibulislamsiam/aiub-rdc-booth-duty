@@ -3,7 +3,7 @@
 // ==========================================
 
 const GOOGLE_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbzftUYDWVssc-_Eu01X-M5gxpqA6p16SEY9rc5UTKQlwK23EIW9i0z4rpj48Z66T1ETkA/exec";
+    "https://script.google.com/macros/s/AKfycby9upbLZou9ar3eGXbKBO6HxPeCywQMvvtgbHDDz1uHmpX-nnif1cWUxjDzw6LCiDbXwg/exec";
 
 
 // ==========================================
@@ -36,49 +36,85 @@ const timeSlots = [
 // CREATE TIMETABLE
 // ==========================================
 
-const timetable = document.getElementById("timetable");
+const timetable =
+    document.getElementById("timetable");
+
 
 days.forEach(day => {
 
-    const daySection = document.createElement("div");
+    const daySection =
+        document.createElement("div");
 
-    daySection.className = "day-section";
+
+    daySection.className =
+        "day-section";
+
 
     daySection.innerHTML = `
-        <div class="day-title">${day}</div>
 
-        <div class="slots" id="${day}-slots"></div>
+        <div class="day-title">
+            ${day}
+        </div>
+
+        <div
+            class="slots"
+            id="${day}-slots">
+        </div>
+
     `;
 
-    timetable.appendChild(daySection);
+
+    timetable.appendChild(
+        daySection
+    );
+
 
     const slotContainer =
-        document.getElementById(`${day}-slots`);
+        document.getElementById(
+            `${day}-slots`
+        );
 
 
     timeSlots.forEach(time => {
 
-        const slot = document.createElement("div");
-
-        slot.className = "slot";
-
-        slot.innerText = time;
-
-        slot.dataset.day = day;
-
-        slot.dataset.time = time;
+        const slot =
+            document.createElement("div");
 
 
-        slot.addEventListener("click", function () {
-
-            slot.classList.toggle("selected");
-
-            calculateFreeTime();
-
-        });
+        slot.className =
+            "slot";
 
 
-        slotContainer.appendChild(slot);
+        slot.innerText =
+            time;
+
+
+        slot.dataset.day =
+            day;
+
+
+        slot.dataset.time =
+            time;
+
+
+        slot.addEventListener(
+            "click",
+            function () {
+
+                slot.classList.toggle(
+                    "selected"
+                );
+
+
+                calculateFreeTime();
+
+            }
+        );
+
+
+        slotContainer.appendChild(
+            slot
+        );
 
     });
 
@@ -92,7 +128,10 @@ days.forEach(day => {
 function calculateFreeTime() {
 
     const freeTimeDiv =
-        document.getElementById("freeTime");
+        document.getElementById(
+            "freeTime"
+        );
+
 
     freeTimeDiv.innerHTML = "";
 
@@ -119,28 +158,41 @@ function calculateFreeTime() {
 
         const freeTimes =
             timeSlots.filter(
-                time => !selectedTimes.includes(time)
+                time =>
+                    !selectedTimes.includes(
+                        time
+                    )
             );
 
 
         const dayDiv =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
-        dayDiv.className = "free-day";
+        dayDiv.className =
+            "free-day";
 
 
         dayDiv.innerHTML = `
-            <strong>${day}</strong>
+
+            <strong>
+                ${day}
+            </strong>
+
             ${
                 freeTimes.length > 0
                     ? freeTimes.join(", ")
                     : "No free time"
             }
+
         `;
 
 
-        freeTimeDiv.appendChild(dayDiv);
+        freeTimeDiv.appendChild(
+            dayDiv
+        );
 
     });
 
@@ -173,7 +225,10 @@ function getFreeTime(day) {
 
     const freeTimes =
         timeSlots.filter(
-            time => !selectedTimes.includes(time)
+            time =>
+                !selectedTimes.includes(
+                    time
+                )
         );
 
 
@@ -183,39 +238,59 @@ function getFreeTime(day) {
 
 
 // ==========================================
-// SUBMIT
+// SUBMIT BUTTON
 // ==========================================
 
-document
-    .getElementById("submitBtn")
-    .addEventListener("click", async function () {
+const submitBtn =
+    document.getElementById(
+        "submitBtn"
+    );
+
+
+submitBtn.addEventListener(
+    "click",
+    async function () {
+
+
+        // Prevent multiple clicks
+
+        if (
+            submitBtn.disabled
+        ) {
+            return;
+        }
 
 
         const name =
-            document.getElementById("name")
+            document
+                .getElementById("name")
                 .value
                 .trim();
 
 
         const studentId =
-            document.getElementById("studentId")
+            document
+                .getElementById("studentId")
                 .value
                 .trim();
 
 
         const department =
-            document.getElementById("department")
+            document
+                .getElementById("department")
                 .value;
 
 
         const phone =
-            document.getElementById("phone")
+            document
+                .getElementById("phone")
                 .value
                 .trim();
 
 
         const note =
-            document.getElementById("note")
+            document
+                .getElementById("note")
                 .value
                 .trim();
 
@@ -226,7 +301,9 @@ document
 
         if (!name) {
 
-            alert("Please enter your name.");
+            alert(
+                "Please enter your name."
+            );
 
             return;
 
@@ -235,7 +312,9 @@ document
 
         if (!studentId) {
 
-            alert("Please enter your Student ID.");
+            alert(
+                "Please enter your Student ID."
+            );
 
             return;
 
@@ -244,7 +323,9 @@ document
 
         if (!department) {
 
-            alert("Please select your department.");
+            alert(
+                "Please select your department."
+            );
 
             return;
 
@@ -253,11 +334,23 @@ document
 
         if (!phone) {
 
-            alert("Please enter your phone number.");
+            alert(
+                "Please enter your phone number."
+            );
 
             return;
 
         }
+
+
+        // ======================================
+        // DISABLE BUTTON
+        // ======================================
+
+        submitBtn.disabled = true;
+
+        submitBtn.innerText =
+            "Submitting...";
 
 
         // ======================================
@@ -274,13 +367,17 @@ document
 
             phone: phone,
 
-            sunday: getFreeTime("Sunday"),
+            sunday:
+                getFreeTime("Sunday"),
 
-            monday: getFreeTime("Monday"),
+            monday:
+                getFreeTime("Monday"),
 
-            tuesday: getFreeTime("Tuesday"),
+            tuesday:
+                getFreeTime("Tuesday"),
 
-            wednesday: getFreeTime("Wednesday"),
+            wednesday:
+                getFreeTime("Wednesday"),
 
             note: note
 
@@ -288,7 +385,7 @@ document
 
 
         // ======================================
-        // SEND TO GOOGLE SHEET
+        // SEND DATA
         // ======================================
 
         try {
@@ -317,20 +414,65 @@ document
                 await response.json();
 
 
-            if (result.success) {
+            // ==================================
+            // DUPLICATE STUDENT ID
+            // ==================================
 
-                document.getElementById(
-                    "successModal"
-                ).style.display = "flex";
+            if (
+                result.duplicate
+            ) {
+
+                alert(
+                    "This Student ID has already submitted.\n\n" +
+                    "One Student ID can submit only once."
+                );
+
+
+                submitBtn.disabled =
+                    false;
+
+
+                submitBtn.innerText =
+                    "Submit Availability";
+
+
+                return;
+
+            }
+
+
+            // ==================================
+            // SUCCESS
+            // ==================================
+
+            if (
+                result.success
+            ) {
+
+                submitBtn.innerText =
+                    "Submitted ✓";
+
+
+                submitBtn.style.background =
+                    "#16a34a";
+
+
+                showSuccessMessage();
 
 
                 resetForm();
 
-            } else {
 
-                alert(
-                    "Something went wrong:\n" +
-                    result.message
+                startCountdown();
+
+            }
+
+
+            else {
+
+                throw new Error(
+                    result.message ||
+                    "Submission failed."
                 );
 
             }
@@ -343,12 +485,93 @@ document
 
             alert(
                 "Could not submit the form.\n\n" +
-                "Please check your internet connection."
+                error.message
             );
+
+
+            submitBtn.disabled =
+                false;
+
+
+            submitBtn.innerText =
+                "Submit Availability";
 
         }
 
-    });
+    }
+);
+
+
+// ==========================================
+// SUCCESS MESSAGE
+// ==========================================
+
+function showSuccessMessage() {
+
+    const modal =
+        document.getElementById(
+            "successModal"
+        );
+
+
+    modal.style.display =
+        "flex";
+
+}
+
+
+// ==========================================
+// COUNTDOWN
+// ==========================================
+
+function startCountdown() {
+
+    let seconds = 10;
+
+
+    submitBtn.disabled =
+        true;
+
+
+    const timer =
+        setInterval(
+            function () {
+
+                submitBtn.innerText =
+                    `Submitted ✓ (${seconds}s)`;
+
+
+                seconds--;
+
+
+                if (
+                    seconds < 0
+                ) {
+
+                    clearInterval(
+                        timer
+                    );
+
+
+                    submitBtn.disabled =
+                        false;
+
+
+                    submitBtn.innerText =
+                        "Submit Availability";
+
+
+                    submitBtn.style.background =
+                        "";
+
+
+                }
+
+            },
+            1000
+        );
+
+}
 
 
 // ==========================================
@@ -357,22 +580,40 @@ document
 
 function resetForm() {
 
-    document.getElementById("name").value = "";
+    document.getElementById(
+        "name"
+    ).value = "";
 
-    document.getElementById("studentId").value = "";
 
-    document.getElementById("department").value = "";
+    document.getElementById(
+        "studentId"
+    ).value = "";
 
-    document.getElementById("phone").value = "";
 
-    document.getElementById("note").value = "";
+    document.getElementById(
+        "department"
+    ).value = "";
+
+
+    document.getElementById(
+        "phone"
+    ).value = "";
+
+
+    document.getElementById(
+        "note"
+    ).value = "";
 
 
     document
-        .querySelectorAll(".slot.selected")
+        .querySelectorAll(
+            ".slot.selected"
+        )
         .forEach(slot => {
 
-            slot.classList.remove("selected");
+            slot.classList.remove(
+                "selected"
+            );
 
         });
 
@@ -390,6 +631,7 @@ function closeModal() {
 
     document.getElementById(
         "successModal"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 }
