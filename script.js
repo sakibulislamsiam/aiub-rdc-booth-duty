@@ -20,7 +20,6 @@ const timeSlots = [
 ];
 
 
-
 /* ================= TIMETABLE ================= */
 
 const timetable =
@@ -32,10 +31,8 @@ days.forEach(day => {
     const daySection =
         document.createElement("div");
 
-
     daySection.className =
         "day-section";
-
 
     daySection.innerHTML = `
         <div class="day-title">
@@ -48,17 +45,14 @@ days.forEach(day => {
         </div>
     `;
 
-
     timetable.appendChild(
         daySection
     );
-
 
     const slotContainer =
         document.getElementById(
             `${day}-slots`
         );
-
 
     timeSlots.forEach(time => {
 
@@ -67,22 +61,17 @@ days.forEach(day => {
                 "div"
             );
 
-
         slot.className =
             "slot";
-
 
         slot.innerText =
             time;
 
-
         slot.dataset.day =
             day;
 
-
         slot.dataset.time =
             time;
-
 
         slot.addEventListener(
             "click",
@@ -92,12 +81,10 @@ days.forEach(day => {
                     "selected"
                 );
 
-
                 calculateFreeTime();
 
             }
         );
-
 
         slotContainer.appendChild(
             slot
@@ -106,7 +93,6 @@ days.forEach(day => {
     });
 
 });
-
 
 
 /* ================= FREE TIME ================= */
@@ -118,9 +104,7 @@ function getFreeTime(day) {
             `.slot[data-day="${day}"].selected`
         );
 
-
     const selectedTimes = [];
-
 
     selectedSlots.forEach(slot => {
 
@@ -130,7 +114,6 @@ function getFreeTime(day) {
 
     });
 
-
     const freeTimes =
         timeSlots.filter(
             time =>
@@ -139,11 +122,9 @@ function getFreeTime(day) {
                 )
         );
 
-
     return freeTimes.join(", ");
 
 }
-
 
 
 function calculateFreeTime() {
@@ -153,31 +134,25 @@ function calculateFreeTime() {
             "freeTime"
         );
 
-
     freeTimeDiv.innerHTML = "";
-
 
     days.forEach(day => {
 
         const freeTimes =
             getFreeTime(day);
 
-
         const dayDiv =
             document.createElement(
                 "div"
             );
 
-
         dayDiv.className =
             "free-day";
-
 
         dayDiv.innerHTML = `
             <strong>${day}</strong>
             ${freeTimes || "No free time"}
         `;
-
 
         freeTimeDiv.appendChild(
             dayDiv
@@ -186,7 +161,6 @@ function calculateFreeTime() {
     });
 
 }
-
 
 
 /* ================= SUBMIT ================= */
@@ -201,15 +175,10 @@ submitBtn.addEventListener(
     "click",
     async function () {
 
-
-        // Prevent double click
-
         if (
             submitBtn.disabled
         ) {
-
             return;
-
         }
 
 
@@ -245,7 +214,6 @@ submitBtn.addEventListener(
                 .getElementById("note")
                 .value
                 .trim();
-
 
 
         /* ================= VALIDATION ================= */
@@ -294,16 +262,13 @@ submitBtn.addEventListener(
         }
 
 
-
         /* ================= DISABLE ================= */
 
         submitBtn.disabled =
             true;
 
-
         submitBtn.innerText =
             "Submitting...";
-
 
 
         /* ================= DATA ================= */
@@ -335,7 +300,6 @@ submitBtn.addEventListener(
         };
 
 
-
         /* ================= SEND ================= */
 
         try {
@@ -364,7 +328,6 @@ submitBtn.addEventListener(
                 await response.json();
 
 
-
             /* ================= DUPLICATE ================= */
 
             if (
@@ -374,21 +337,17 @@ submitBtn.addEventListener(
                 submitBtn.disabled =
                     false;
 
-
                 submitBtn.innerText =
                     "Submit Availability";
-
 
                 alert(
                     "This Student ID has already submitted.\n\n" +
                     "One Student ID can submit only once."
                 );
 
-
                 return;
 
             }
-
 
 
             /* ================= SUCCESS ================= */
@@ -400,24 +359,24 @@ submitBtn.addEventListener(
                 submitBtn.innerText =
                     "Submitted ✓";
 
-
                 submitBtn.style.background =
                     "#16a34a";
 
-
                 showSuccessMessage();
 
+                /*
+                 * IMPORTANT:
+                 * Clear all student information
+                 * AND all selected time slots.
+                 */
 
                 resetForm();
 
-
                 startCountdown();
-
 
                 return;
 
             }
-
 
 
             throw new Error(
@@ -434,16 +393,13 @@ submitBtn.addEventListener(
                 error
             );
 
-
             alert(
                 "Submission failed.\n\n" +
                 error.message
             );
 
-
             submitBtn.disabled =
                 false;
-
 
             submitBtn.innerText =
                 "Submit Availability";
@@ -454,17 +410,14 @@ submitBtn.addEventListener(
 );
 
 
-
 /* ================= COUNTDOWN ================= */
 
 function startCountdown() {
 
     let seconds = 10;
 
-
     submitBtn.disabled =
         true;
-
 
     const timer =
         setInterval(
@@ -473,9 +426,7 @@ function startCountdown() {
                 submitBtn.innerText =
                     `Submitted ✓ (${seconds}s)`;
 
-
                 seconds--;
-
 
                 if (
                     seconds < 0
@@ -485,14 +436,11 @@ function startCountdown() {
                         timer
                     );
 
-
                     submitBtn.disabled =
                         false;
 
-
                     submitBtn.innerText =
                         "Submit Availability";
-
 
                     submitBtn.style.background =
                         "";
@@ -506,7 +454,6 @@ function startCountdown() {
 }
 
 
-
 /* ================= SUCCESS MESSAGE ================= */
 
 function showSuccessMessage() {
@@ -515,7 +462,6 @@ function showSuccessMessage() {
         document.getElementById(
             "successModal"
         );
-
 
     if (modal) {
 
@@ -527,53 +473,54 @@ function showSuccessMessage() {
 }
 
 
-
 /* ================= RESET ================= */
 
 function resetForm() {
+
+    /* Clear student information */
 
     document.getElementById(
         "name"
     ).value = "";
 
-
     document.getElementById(
         "studentId"
     ).value = "";
-
 
     document.getElementById(
         "department"
     ).value = "";
 
-
     document.getElementById(
         "phone"
     ).value = "";
-
 
     document.getElementById(
         "note"
     ).value = "";
 
 
-    document
-        .querySelectorAll(
-            ".slot.selected"
-        )
-        .forEach(slot => {
+    /* Clear ALL selected time slots */
 
+    const selectedSlots =
+        document.querySelectorAll(
+            ".slot.selected"
+        );
+
+    selectedSlots.forEach(
+        slot => {
             slot.classList.remove(
                 "selected"
             );
+        }
+    );
 
-        });
 
+    /* Refresh "Your Available Time" */
 
     calculateFreeTime();
 
 }
-
 
 
 /* ================= CLOSE MODAL ================= */
@@ -584,7 +531,6 @@ function closeModal() {
         document.getElementById(
             "successModal"
         );
-
 
     if (modal) {
 
