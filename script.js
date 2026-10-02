@@ -24,7 +24,6 @@ const timeSlots = [
 
 const timetable = document.getElementById("timetable");
 
-
 days.forEach(day => {
 
     const daySection = document.createElement("div");
@@ -32,35 +31,24 @@ days.forEach(day => {
     daySection.className = "day-section";
 
     daySection.innerHTML = `
-        <div class="day-title">
-            ${day}
-        </div>
-
-        <div
-            class="slots"
-            id="${day}-slots">
-        </div>
+        <div class="day-title">${day}</div>
+        <div class="slots" id="${day}-slots"></div>
     `;
 
     timetable.appendChild(daySection);
 
-
     const slotContainer =
         document.getElementById(`${day}-slots`);
-
 
     timeSlots.forEach(time => {
 
         const slot = document.createElement("div");
 
         slot.className = "slot";
-
         slot.innerText = time;
 
         slot.dataset.day = day;
-
         slot.dataset.time = time;
-
 
         slot.addEventListener("click", function () {
 
@@ -70,7 +58,6 @@ days.forEach(day => {
 
         });
 
-
         slotContainer.appendChild(slot);
 
     });
@@ -78,7 +65,7 @@ days.forEach(day => {
 });
 
 
-/* ================= GET FREE TIME ================= */
+/* ================= FREE TIME ================= */
 
 function getFreeTime(day) {
 
@@ -87,83 +74,40 @@ function getFreeTime(day) {
             `.slot[data-day="${day}"].selected`
         );
 
-
     const selectedTimes = [];
 
-
     selectedSlots.forEach(slot => {
-
-        selectedTimes.push(
-            slot.dataset.time
-        );
-
+        selectedTimes.push(slot.dataset.time);
     });
 
-
-    const freeTimes =
-        timeSlots.filter(
-            time => !selectedTimes.includes(time)
-        );
-
-
-    return freeTimes.join(", ");
+    return timeSlots.filter(time =>
+        !selectedTimes.includes(time)
+    ).join(", ");
 
 }
 
-
-/* ================= SHOW FREE TIME ================= */
 
 function calculateFreeTime() {
 
     const freeTimeDiv =
         document.getElementById("freeTime");
 
+    if (!freeTimeDiv) return;
 
-    if (!freeTimeDiv) {
-        return;
-    }
-
-
-    /* Completely clear old result */
-
-    freeTimeDiv.replaceChildren();
-
-
-    /* Create fresh result */
+    freeTimeDiv.innerHTML = "";
 
     days.forEach(day => {
 
-        const freeTimes =
-            getFreeTime(day);
+        const freeTimes = getFreeTime(day);
 
+        const dayDiv = document.createElement("div");
 
-        const dayDiv =
-            document.createElement("div");
+        dayDiv.className = "free-day";
 
-
-        dayDiv.className =
-            "free-day";
-
-
-        const title =
-            document.createElement("strong");
-
-
-        title.innerText =
-            day;
-
-
-        dayDiv.appendChild(title);
-
-
-        const text =
-            document.createTextNode(
-                " " + (freeTimes || "No free time")
-            );
-
-
-        dayDiv.appendChild(text);
-
+        dayDiv.innerHTML = `
+            <strong>${day}</strong>
+            ${freeTimes || "No free time"}
+        `;
 
         freeTimeDiv.appendChild(dayDiv);
 
@@ -172,248 +116,195 @@ function calculateFreeTime() {
 }
 
 
+/* ================= INITIAL FREE TIME ================= */
+
+calculateFreeTime();
+
+
 /* ================= SUBMIT ================= */
 
 const submitBtn =
     document.getElementById("submitBtn");
 
 
-submitBtn.addEventListener(
-    "click",
-    async function () {
+submitBtn.addEventListener("click", async function () {
 
+    if (submitBtn.disabled) {
+        return;
+    }
 
-        if (submitBtn.disabled) {
-            return;
-        }
 
+    const name =
+        document.getElementById("name").value.trim();
 
-        /* ================= STUDENT INFORMATION ================= */
+    const studentId =
+        document.getElementById("studentId").value.trim();
 
-        const name =
-            document
-                .getElementById("name")
-                .value
-                .trim();
+    const department =
+        document.getElementById("department").value;
 
+    const phone =
+        document.getElementById("phone").value.trim();
 
-        const studentId =
-            document
-                .getElementById("studentId")
-                .value
-                .trim();
+    const note =
+        document.getElementById("note").value.trim();
 
 
-        const department =
-            document
-                .getElementById("department")
-                .value;
+    /* ================= VALIDATION ================= */
 
+    if (!name) {
+        alert("Please enter your name.");
+        return;
+    }
 
-        const phone =
-            document
-                .getElementById("phone")
-                .value
-                .trim();
+    if (!studentId) {
+        alert("Please enter your Student ID.");
+        return;
+    }
 
+    if (!department) {
+        alert("Please select your department.");
+        return;
+    }
 
-        const note =
-            document
-                .getElementById("note")
-                .value
-                .trim();
+    if (!phone) {
+        alert("Please enter your phone number.");
+        return;
+    }
 
 
-        /* ================= VALIDATION ================= */
+    /* ================= DISABLE BUTTON ================= */
 
-        if (!name) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
 
-            alert("Please enter your name.");
 
-            return;
-        }
+    /* ================= DATA ================= */
 
+    const data = {
 
-        if (!studentId) {
+        name: name,
 
-            alert("Please enter your Student ID.");
+        studentId: studentId,
 
-            return;
-        }
+        department: department,
 
+        phone: phone,
 
-        if (!department) {
+        sunday: getFreeTime("Sunday"),
 
-            alert("Please select your department.");
+        monday: getFreeTime("Monday"),
 
-            return;
-        }
+        tuesday: getFreeTime("Tuesday"),
 
+        wednesday: getFreeTime("Wednesday"),
 
-        if (!phone) {
+        note: note
 
-            alert("Please enter your phone number.");
+    };
 
-            return;
-        }
 
+    /* ================= SEND ================= */
 
-        /* ================= DISABLE BUTTON ================= */
+    try {
 
-        submitBtn.disabled = true;
+        const formData = new URLSearchParams();
 
-        submitBtn.innerText = "Submitting...";
+        formData.append(
+            "payload",
+            JSON.stringify(data)
+        );
 
 
-        /* ================= DATA ================= */
-
-        const data = {
-
-            name: name,
-
-            studentId: studentId,
-
-            department: department,
-
-            phone: phone,
-
-            sunday: getFreeTime("Sunday"),
-
-            monday: getFreeTime("Monday"),
-
-            tuesday: getFreeTime("Tuesday"),
-
-            wednesday: getFreeTime("Wednesday"),
-
-            note: note
-
-        };
-
-
-        /* ================= SEND ================= */
-
-        try {
-
-            const formData =
-                new URLSearchParams();
-
-
-            formData.append(
-                "payload",
-                JSON.stringify(data)
-            );
-
-
-            const response =
-                await fetch(
-                    GOOGLE_SCRIPT_URL,
-                    {
-                        method: "POST",
-                        body: formData
-                    }
-                );
-
-
-            const result =
-                await response.json();
-
-
-            /* ================= DUPLICATE ================= */
-
-            if (result.duplicate === true) {
-
-                submitBtn.disabled = false;
-
-                submitBtn.innerText =
-                    "Submit Availability";
-
-
-                alert(
-                    "This Student ID has already submitted.\n\n" +
-                    "One Student ID can submit only once."
-                );
-
-
-                return;
+        const response = await fetch(
+            GOOGLE_SCRIPT_URL,
+            {
+                method: "POST",
+                body: formData
             }
+        );
 
 
-            /* ================= SUCCESS ================= */
-
-            if (result.success === true) {
-
-                /*
-                 * FIRST reset everything.
-                 */
-
-                resetEverything();
+        const result = await response.json();
 
 
-                /*
-                 * THEN show success.
-                 */
+        /* ================= DUPLICATE ================= */
 
-                submitBtn.innerText =
-                    "Submitted ✓";
-
-
-                submitBtn.style.background =
-                    "#16a34a";
-
-
-                showSuccessMessage();
-
-
-                /*
-                 * Keep button disabled.
-                 */
-
-                submitBtn.disabled = true;
-
-
-                return;
-            }
-
-
-            throw new Error(
-                result.message ||
-                "Submission failed."
-            );
-
-        }
-
-
-        /* ================= ERROR ================= */
-
-        catch (error) {
-
-            console.error(error);
-
-
-            alert(
-                "Submission failed.\n\n" +
-                error.message
-            );
-
+        if (result.duplicate === true) {
 
             submitBtn.disabled = false;
 
             submitBtn.innerText =
                 "Submit Availability";
 
-            submitBtn.style.background = "";
+            alert(
+                "This Student ID has already submitted.\n\n" +
+                "One Student ID can submit only once."
+            );
 
+            return;
         }
 
+
+        /* ================= SUCCESS ================= */
+
+        if (result.success === true) {
+
+            /*
+             * First reset everything
+             */
+            resetForm();
+
+
+            /*
+             * Then show success message
+             */
+            showSuccessMessage();
+
+
+            /*
+             * Button stays disabled after successful submission
+             */
+            submitBtn.innerText = "Submitted ✓";
+
+            submitBtn.style.background = "#16a34a";
+
+            return;
+        }
+
+
+        throw new Error(
+            result.message ||
+            "Submission failed."
+        );
+
     }
-);
 
 
-/* ================= RESET EVERYTHING ================= */
+    catch (error) {
 
-function resetEverything() {
+        console.error(error);
 
-    /* ================= CLEAR STUDENT INFO ================= */
+        alert(
+            "Submission failed.\n\n" +
+            error.message
+        );
+
+        submitBtn.disabled = false;
+
+        submitBtn.innerText =
+            "Submit Availability";
+
+    }
+
+});
+
+
+/* ================= RESET FORM ================= */
+
+function resetForm() {
+
+    /* Clear student information */
 
     document.getElementById("name").value = "";
 
@@ -426,61 +317,25 @@ function resetEverything() {
     document.getElementById("note").value = "";
 
 
-    /* ================= CLEAR ALL TIME SELECTIONS ================= */
+    /* Clear selected class slots */
 
-    const slots =
-        document.querySelectorAll(".slot");
+    const selectedSlots =
+        document.querySelectorAll(".slot.selected");
 
-
-    slots.forEach(slot => {
+    selectedSlots.forEach(slot => {
 
         slot.classList.remove("selected");
 
     });
 
 
-    /* ================= COMPLETELY REBUILD AVAILABLE TIME ================= */
+    /*
+     * IMPORTANT:
+     * Recalculate available time AFTER
+     * removing all selected slots.
+     */
 
-    const freeTimeDiv =
-        document.getElementById("freeTime");
-
-
-    freeTimeDiv.innerHTML = "";
-
-
-    days.forEach(day => {
-
-        const dayDiv =
-            document.createElement("div");
-
-
-        dayDiv.className =
-            "free-day";
-
-
-        const title =
-            document.createElement("strong");
-
-
-        title.innerText =
-            day;
-
-
-        dayDiv.appendChild(title);
-
-
-        const text =
-            document.createTextNode(
-                " " + timeSlots.join(", ")
-            );
-
-
-        dayDiv.appendChild(text);
-
-
-        freeTimeDiv.appendChild(dayDiv);
-
-    });
+    calculateFreeTime();
 
 }
 
@@ -491,7 +346,6 @@ function showSuccessMessage() {
 
     const modal =
         document.getElementById("successModal");
-
 
     if (modal) {
 
@@ -508,7 +362,6 @@ function closeModal() {
 
     const modal =
         document.getElementById("successModal");
-
 
     if (modal) {
 
