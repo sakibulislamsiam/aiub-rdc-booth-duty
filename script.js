@@ -117,21 +117,15 @@ function getFreeTime(day) {
     });
 
 
-    const freeTimes =
-        timeSlots.filter(
+    return timeSlots
+        .filter(
             time =>
-                !selectedTimes.includes(
-                    time
-                )
-        );
-
-
-    return freeTimes.join(", ");
+                !selectedTimes.includes(time)
+        )
+        .join(", ");
 
 }
 
-
-/* ================= CALCULATE FREE TIME ================= */
 
 function calculateFreeTime() {
 
@@ -197,14 +191,14 @@ submitBtn.addEventListener(
     "click",
     async function () {
 
-        /* Prevent double click */
+        /* Prevent double submission */
 
         if (submitBtn.disabled) {
             return;
         }
 
 
-        /* ================= GET FORM DATA ================= */
+        /* ================= GET DATA ================= */
 
         const name =
             document
@@ -282,13 +276,18 @@ submitBtn.addEventListener(
         }
 
 
-        /* ================= DISABLE BUTTON ================= */
+        /* ================= BUTTON IMMEDIATE RESPONSE ================= */
 
-        submitBtn.disabled =
-            true;
+        submitBtn.disabled = true;
 
         submitBtn.innerText =
             "Submitting...";
+
+        submitBtn.style.opacity =
+            "0.7";
+
+        submitBtn.style.cursor =
+            "wait";
 
 
         /* ================= DATA ================= */
@@ -325,7 +324,7 @@ submitBtn.addEventListener(
         };
 
 
-        /* ================= SEND TO GOOGLE SHEET ================= */
+        /* ================= SEND ================= */
 
         try {
 
@@ -338,6 +337,12 @@ submitBtn.addEventListener(
                 JSON.stringify(data)
             );
 
+
+            /*
+             * Send request to Google Apps Script.
+             * Button already changed to "Submitting..."
+             * before this request starts.
+             */
 
             const response =
                 await fetch(
@@ -365,6 +370,12 @@ submitBtn.addEventListener(
                 submitBtn.innerText =
                     "Submit Availability";
 
+                submitBtn.style.opacity =
+                    "1";
+
+                submitBtn.style.cursor =
+                    "pointer";
+
 
                 alert(
                     "This Student ID has already submitted.\n\n" +
@@ -382,27 +393,22 @@ submitBtn.addEventListener(
                 result.success === true
             ) {
 
-                /*
-                 * Reset everything
-                 */
                 resetForm();
 
-
-                /*
-                 * Show success popup
-                 */
                 showSuccessMessage();
 
 
-                /*
-                 * No countdown
-                 */
                 submitBtn.innerText =
                     "Submitted ✓";
 
-
                 submitBtn.style.background =
                     "#16a34a";
+
+                submitBtn.style.opacity =
+                    "1";
+
+                submitBtn.style.cursor =
+                    "default";
 
 
                 return;
@@ -435,9 +441,14 @@ submitBtn.addEventListener(
             submitBtn.disabled =
                 false;
 
-
             submitBtn.innerText =
                 "Submit Availability";
+
+            submitBtn.style.opacity =
+                "1";
+
+            submitBtn.style.cursor =
+                "pointer";
 
         }
 
@@ -449,42 +460,32 @@ submitBtn.addEventListener(
 
 function resetForm() {
 
-    /* Clear Name */
-
     document.getElementById(
         "name"
     ).value = "";
 
-
-    /* Clear Student ID */
 
     document.getElementById(
         "studentId"
     ).value = "";
 
 
-    /* Clear Department */
-
     document.getElementById(
         "department"
     ).value = "";
 
-
-    /* Clear Phone */
 
     document.getElementById(
         "phone"
     ).value = "";
 
 
-    /* Clear Note */
-
     document.getElementById(
         "note"
     ).value = "";
 
 
-    /* Remove selected class slots */
+    /* Remove selected slots */
 
     document
         .querySelectorAll(
@@ -500,12 +501,7 @@ function resetForm() {
 
 
     /*
-     * IMPORTANT:
-     * Clear the available-time section.
-     *
-     * We DO NOT call calculateFreeTime()
-     * here, because that would show all
-     * time slots again.
+     * Clear available time section.
      */
 
     document.getElementById(
