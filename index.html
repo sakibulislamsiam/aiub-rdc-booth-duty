@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AIUB R&D Club - Booth Duty</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>AIUB Research & Development Club</h1>
+            <p>Recruitment Booth Duty Management</p>
+        </div>
+
+
+        <!-- Student Information -->
+
+        <div class="card">
+
+            <h2>Student Information</h2>
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Enter your name"
+                    >
+                </div>
+
+                <div>
+                    <label>Student ID</label>
+                    <input
+                        type="text"
+                        id="studentId"
+                        placeholder="Example: 23-54661-3"
+                    >
+                </div>
+
+                <div>
+                    <label>Department</label>
+
+                    <select id="department">
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                        <option value="CSE">
+                            CSE
+                        </option>
+
+                        <option value="EEE">
+                            EEE
+                        </option>
+
+                        <option value="BBA">
+                            BBA
+                        </option>
+
+                        <option value="Architecture">
+                            Architecture
+                        </option>
+
+                        <option value="Pharmacy">
+                            Pharmacy
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div>
+                    <label>Phone</label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        placeholder="01XXXXXXXXX"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Class Schedule -->
+
+        <div class="card">
+
+            <h2>Class Schedule</h2>
+
+            <p class="info">
+                Select the time slots when you have classes.
+                The website will automatically calculate your free time.
+            </p>
+
+            <div id="timetable"></div>
+
+        </div>
+
+
+        <!-- Free Time -->
+
+        <div class="card">
+
+            <h2>Your Available Time</h2>
+
+            <div id="freeTime"></div>
+
+        </div>
+
+
+        <!-- Note -->
+
+        <div class="card">
+
+            <h2>Additional Note</h2>
+
+            <textarea
+                id="note"
+                placeholder="Anything you want to mention..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- Submit -->
+
+        <button id="submitBtn">
+            Submit Availability
+        </button>
+
+    </div>
+
+
+    <!-- Success Modal -->
+
+    <div id="successModal" class="modal">
+
+        <div class="modal-box">
+
+            <h2>Submitted Successfully! 🎉</h2>
+
+            <p>
+                Your availability has been recorded.
+            </p>
+
+            <button onclick="closeModal()">
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
