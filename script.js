@@ -1,14 +1,6 @@
-// ==========================================
-// GOOGLE APPS SCRIPT URL
-// ==========================================
-
 const GOOGLE_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycby9upbLZou9ar3eGXbKBO6HxPeCywQMvvtgbHDDz1uHmpX-nnif1cWUxjDzw6LCiDbXwg/exec";
+    "https://script.google.com/macros/s/AKfycbzftUYDWVssc-_Eu01X-M5gxpqA6p16SEY9rc5UTKQlwK23EIW9i0z4rpj48Z66T1ETkA/exec";
 
-
-// ==========================================
-// DAYS
-// ==========================================
 
 const days = [
     "Sunday",
@@ -17,10 +9,6 @@ const days = [
     "Wednesday"
 ];
 
-
-// ==========================================
-// TIME SLOTS
-// ==========================================
 
 const timeSlots = [
     "8:00 AM - 9:30 AM",
@@ -32,9 +20,8 @@ const timeSlots = [
 ];
 
 
-// ==========================================
-// CREATE TIMETABLE
-// ==========================================
+
+/* ================= TIMETABLE ================= */
 
 const timetable =
     document.getElementById("timetable");
@@ -51,7 +38,6 @@ days.forEach(day => {
 
 
     daySection.innerHTML = `
-
         <div class="day-title">
             ${day}
         </div>
@@ -60,7 +46,6 @@ days.forEach(day => {
             class="slots"
             id="${day}-slots">
         </div>
-
     `;
 
 
@@ -78,7 +63,9 @@ days.forEach(day => {
     timeSlots.forEach(time => {
 
         const slot =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         slot.className =
@@ -121,87 +108,8 @@ days.forEach(day => {
 });
 
 
-// ==========================================
-// CALCULATE FREE TIME
-// ==========================================
 
-function calculateFreeTime() {
-
-    const freeTimeDiv =
-        document.getElementById(
-            "freeTime"
-        );
-
-
-    freeTimeDiv.innerHTML = "";
-
-
-    days.forEach(day => {
-
-        const selectedSlots =
-            document.querySelectorAll(
-                `.slot[data-day="${day}"].selected`
-            );
-
-
-        const selectedTimes = [];
-
-
-        selectedSlots.forEach(slot => {
-
-            selectedTimes.push(
-                slot.dataset.time
-            );
-
-        });
-
-
-        const freeTimes =
-            timeSlots.filter(
-                time =>
-                    !selectedTimes.includes(
-                        time
-                    )
-            );
-
-
-        const dayDiv =
-            document.createElement(
-                "div"
-            );
-
-
-        dayDiv.className =
-            "free-day";
-
-
-        dayDiv.innerHTML = `
-
-            <strong>
-                ${day}
-            </strong>
-
-            ${
-                freeTimes.length > 0
-                    ? freeTimes.join(", ")
-                    : "No free time"
-            }
-
-        `;
-
-
-        freeTimeDiv.appendChild(
-            dayDiv
-        );
-
-    });
-
-}
-
-
-// ==========================================
-// GET FREE TIME
-// ==========================================
+/* ================= FREE TIME ================= */
 
 function getFreeTime(day) {
 
@@ -237,9 +145,51 @@ function getFreeTime(day) {
 }
 
 
-// ==========================================
-// SUBMIT BUTTON
-// ==========================================
+
+function calculateFreeTime() {
+
+    const freeTimeDiv =
+        document.getElementById(
+            "freeTime"
+        );
+
+
+    freeTimeDiv.innerHTML = "";
+
+
+    days.forEach(day => {
+
+        const freeTimes =
+            getFreeTime(day);
+
+
+        const dayDiv =
+            document.createElement(
+                "div"
+            );
+
+
+        dayDiv.className =
+            "free-day";
+
+
+        dayDiv.innerHTML = `
+            <strong>${day}</strong>
+            ${freeTimes || "No free time"}
+        `;
+
+
+        freeTimeDiv.appendChild(
+            dayDiv
+        );
+
+    });
+
+}
+
+
+
+/* ================= SUBMIT ================= */
 
 const submitBtn =
     document.getElementById(
@@ -252,12 +202,14 @@ submitBtn.addEventListener(
     async function () {
 
 
-        // Prevent multiple clicks
+        // Prevent double click
 
         if (
             submitBtn.disabled
         ) {
+
             return;
+
         }
 
 
@@ -295,9 +247,8 @@ submitBtn.addEventListener(
                 .trim();
 
 
-        // ======================================
-        // VALIDATION
-        // ======================================
+
+        /* ================= VALIDATION ================= */
 
         if (!name) {
 
@@ -343,19 +294,19 @@ submitBtn.addEventListener(
         }
 
 
-        // ======================================
-        // DISABLE BUTTON
-        // ======================================
 
-        submitBtn.disabled = true;
+        /* ================= DISABLE ================= */
+
+        submitBtn.disabled =
+            true;
+
 
         submitBtn.innerText =
             "Submitting...";
 
 
-        // ======================================
-        // PREPARE DATA
-        // ======================================
+
+        /* ================= DATA ================= */
 
         const data = {
 
@@ -384,9 +335,8 @@ submitBtn.addEventListener(
         };
 
 
-        // ======================================
-        // SEND DATA
-        // ======================================
+
+        /* ================= SEND ================= */
 
         try {
 
@@ -414,19 +364,12 @@ submitBtn.addEventListener(
                 await response.json();
 
 
-            // ==================================
-            // DUPLICATE STUDENT ID
-            // ==================================
+
+            /* ================= DUPLICATE ================= */
 
             if (
-                result.duplicate
+                result.duplicate === true
             ) {
-
-                alert(
-                    "This Student ID has already submitted.\n\n" +
-                    "One Student ID can submit only once."
-                );
-
 
                 submitBtn.disabled =
                     false;
@@ -436,17 +379,22 @@ submitBtn.addEventListener(
                     "Submit Availability";
 
 
+                alert(
+                    "This Student ID has already submitted.\n\n" +
+                    "One Student ID can submit only once."
+                );
+
+
                 return;
 
             }
 
 
-            // ==================================
-            // SUCCESS
-            // ==================================
+
+            /* ================= SUCCESS ================= */
 
             if (
-                result.success
+                result.success === true
             ) {
 
                 submitBtn.innerText =
@@ -465,26 +413,30 @@ submitBtn.addEventListener(
 
                 startCountdown();
 
-            }
 
-
-            else {
-
-                throw new Error(
-                    result.message ||
-                    "Submission failed."
-                );
+                return;
 
             }
 
 
-        } catch (error) {
 
-            console.error(error);
+            throw new Error(
+                result.message ||
+                "Submission failed."
+            );
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                error
+            );
 
 
             alert(
-                "Could not submit the form.\n\n" +
+                "Submission failed.\n\n" +
                 error.message
             );
 
@@ -502,27 +454,8 @@ submitBtn.addEventListener(
 );
 
 
-// ==========================================
-// SUCCESS MESSAGE
-// ==========================================
 
-function showSuccessMessage() {
-
-    const modal =
-        document.getElementById(
-            "successModal"
-        );
-
-
-    modal.style.display =
-        "flex";
-
-}
-
-
-// ==========================================
-// COUNTDOWN
-// ==========================================
+/* ================= COUNTDOWN ================= */
 
 function startCountdown() {
 
@@ -564,7 +497,6 @@ function startCountdown() {
                     submitBtn.style.background =
                         "";
 
-
                 }
 
             },
@@ -574,9 +506,29 @@ function startCountdown() {
 }
 
 
-// ==========================================
-// RESET FORM
-// ==========================================
+
+/* ================= SUCCESS MESSAGE ================= */
+
+function showSuccessMessage() {
+
+    const modal =
+        document.getElementById(
+            "successModal"
+        );
+
+
+    if (modal) {
+
+        modal.style.display =
+            "flex";
+
+    }
+
+}
+
+
+
+/* ================= RESET ================= */
 
 function resetForm() {
 
@@ -623,15 +575,22 @@ function resetForm() {
 }
 
 
-// ==========================================
-// CLOSE MODAL
-// ==========================================
+
+/* ================= CLOSE MODAL ================= */
 
 function closeModal() {
 
-    document.getElementById(
-        "successModal"
-    ).style.display =
-        "none";
+    const modal =
+        document.getElementById(
+            "successModal"
+        );
+
+
+    if (modal) {
+
+        modal.style.display =
+            "none";
+
+    }
 
 }
