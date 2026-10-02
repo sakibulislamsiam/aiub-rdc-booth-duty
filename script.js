@@ -22,43 +22,73 @@ const timeSlots = [
 
 /* ================= TIMETABLE ================= */
 
-const timetable = document.getElementById("timetable");
+const timetable =
+    document.getElementById("timetable");
+
 
 days.forEach(day => {
 
-    const daySection = document.createElement("div");
+    const daySection =
+        document.createElement("div");
 
-    daySection.className = "day-section";
+    daySection.className =
+        "day-section";
 
     daySection.innerHTML = `
-        <div class="day-title">${day}</div>
-        <div class="slots" id="${day}-slots"></div>
+        <div class="day-title">
+            ${day}
+        </div>
+
+        <div
+            class="slots"
+            id="${day}-slots">
+        </div>
     `;
 
     timetable.appendChild(daySection);
 
+
     const slotContainer =
-        document.getElementById(`${day}-slots`);
+        document.getElementById(
+            `${day}-slots`
+        );
+
 
     timeSlots.forEach(time => {
 
-        const slot = document.createElement("div");
+        const slot =
+            document.createElement("div");
 
-        slot.className = "slot";
-        slot.innerText = time;
+        slot.className =
+            "slot";
 
-        slot.dataset.day = day;
-        slot.dataset.time = time;
+        slot.innerText =
+            time;
 
-        slot.addEventListener("click", function () {
+        slot.dataset.day =
+            day;
 
-            slot.classList.toggle("selected");
+        slot.dataset.time =
+            time;
 
-            calculateFreeTime();
 
-        });
+        slot.addEventListener(
+            "click",
+            function () {
 
-        slotContainer.appendChild(slot);
+                slot.classList.toggle(
+                    "selected"
+                );
+
+                calculateFreeTime();
+
+            }
+        );
+
+
+        slotContainer.appendChild(
+            slot
+        );
 
     });
 
@@ -74,49 +104,83 @@ function getFreeTime(day) {
             `.slot[data-day="${day}"].selected`
         );
 
+
     const selectedTimes = [];
 
+
     selectedSlots.forEach(slot => {
-        selectedTimes.push(slot.dataset.time);
+
+        selectedTimes.push(
+            slot.dataset.time
+        );
+
     });
 
-    return timeSlots.filter(time =>
-        !selectedTimes.includes(time)
-    ).join(", ");
+
+    const freeTimes =
+        timeSlots.filter(
+            time =>
+                !selectedTimes.includes(
+                    time
+                )
+        );
+
+
+    return freeTimes.join(", ");
 
 }
 
 
+/* ================= CALCULATE FREE TIME ================= */
+
 function calculateFreeTime() {
 
     const freeTimeDiv =
-        document.getElementById("freeTime");
+        document.getElementById(
+            "freeTime"
+        );
 
-    if (!freeTimeDiv) return;
+
+    if (!freeTimeDiv) {
+        return;
+    }
+
 
     freeTimeDiv.innerHTML = "";
 
+
     days.forEach(day => {
 
-        const freeTimes = getFreeTime(day);
+        const freeTimes =
+            getFreeTime(day);
 
-        const dayDiv = document.createElement("div");
 
-        dayDiv.className = "free-day";
+        const dayDiv =
+            document.createElement(
+                "div"
+            );
+
+
+        dayDiv.className =
+            "free-day";
+
 
         dayDiv.innerHTML = `
             <strong>${day}</strong>
             ${freeTimes || "No free time"}
         `;
 
-        freeTimeDiv.appendChild(dayDiv);
+
+        freeTimeDiv.appendChild(
+            dayDiv
+        );
 
     });
 
 }
 
 
-/* ================= INITIAL FREE TIME ================= */
+/* ================= INITIAL DISPLAY ================= */
 
 calculateFreeTime();
 
@@ -124,248 +188,367 @@ calculateFreeTime();
 /* ================= SUBMIT ================= */
 
 const submitBtn =
-    document.getElementById("submitBtn");
+    document.getElementById(
+        "submitBtn"
+    );
 
 
-submitBtn.addEventListener("click", async function () {
+submitBtn.addEventListener(
+    "click",
+    async function () {
 
-    if (submitBtn.disabled) {
-        return;
-    }
+        /* Prevent double click */
 
-
-    const name =
-        document.getElementById("name").value.trim();
-
-    const studentId =
-        document.getElementById("studentId").value.trim();
-
-    const department =
-        document.getElementById("department").value;
-
-    const phone =
-        document.getElementById("phone").value.trim();
-
-    const note =
-        document.getElementById("note").value.trim();
+        if (submitBtn.disabled) {
+            return;
+        }
 
 
-    /* ================= VALIDATION ================= */
+        /* ================= GET FORM DATA ================= */
 
-    if (!name) {
-        alert("Please enter your name.");
-        return;
-    }
-
-    if (!studentId) {
-        alert("Please enter your Student ID.");
-        return;
-    }
-
-    if (!department) {
-        alert("Please select your department.");
-        return;
-    }
-
-    if (!phone) {
-        alert("Please enter your phone number.");
-        return;
-    }
+        const name =
+            document
+                .getElementById("name")
+                .value
+                .trim();
 
 
-    /* ================= DISABLE BUTTON ================= */
-
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Submitting...";
-
-
-    /* ================= DATA ================= */
-
-    const data = {
-
-        name: name,
-
-        studentId: studentId,
-
-        department: department,
-
-        phone: phone,
-
-        sunday: getFreeTime("Sunday"),
-
-        monday: getFreeTime("Monday"),
-
-        tuesday: getFreeTime("Tuesday"),
-
-        wednesday: getFreeTime("Wednesday"),
-
-        note: note
-
-    };
+        const studentId =
+            document
+                .getElementById("studentId")
+                .value
+                .trim();
 
 
-    /* ================= SEND ================= */
-
-    try {
-
-        const formData = new URLSearchParams();
-
-        formData.append(
-            "payload",
-            JSON.stringify(data)
-        );
+        const department =
+            document
+                .getElementById("department")
+                .value;
 
 
-        const response = await fetch(
-            GOOGLE_SCRIPT_URL,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+        const phone =
+            document
+                .getElementById("phone")
+                .value
+                .trim();
 
 
-        const result = await response.json();
+        const note =
+            document
+                .getElementById("note")
+                .value
+                .trim();
 
 
-        /* ================= DUPLICATE ================= */
+        /* ================= VALIDATION ================= */
 
-        if (result.duplicate === true) {
-
-            submitBtn.disabled = false;
-
-            submitBtn.innerText =
-                "Submit Availability";
+        if (!name) {
 
             alert(
-                "This Student ID has already submitted.\n\n" +
-                "One Student ID can submit only once."
+                "Please enter your name."
             );
 
             return;
         }
 
 
-        /* ================= SUCCESS ================= */
+        if (!studentId) {
 
-        if (result.success === true) {
-
-            /*
-             * First reset everything
-             */
-            resetForm();
-
-
-            /*
-             * Then show success message
-             */
-            showSuccessMessage();
-
-
-            /*
-             * Button stays disabled after successful submission
-             */
-            submitBtn.innerText = "Submitted ✓";
-
-            submitBtn.style.background = "#16a34a";
+            alert(
+                "Please enter your Student ID."
+            );
 
             return;
         }
 
 
-        throw new Error(
-            result.message ||
-            "Submission failed."
-        );
+        if (!department) {
 
-    }
+            alert(
+                "Please select your department."
+            );
+
+            return;
+        }
 
 
-    catch (error) {
+        if (!phone) {
 
-        console.error(error);
+            alert(
+                "Please enter your phone number."
+            );
 
-        alert(
-            "Submission failed.\n\n" +
-            error.message
-        );
+            return;
+        }
 
-        submitBtn.disabled = false;
+
+        /* ================= DISABLE BUTTON ================= */
+
+        submitBtn.disabled =
+            true;
 
         submitBtn.innerText =
-            "Submit Availability";
+            "Submitting...";
+
+
+        /* ================= DATA ================= */
+
+        const data = {
+
+            name:
+                name,
+
+            studentId:
+                studentId,
+
+            department:
+                department,
+
+            phone:
+                phone,
+
+            sunday:
+                getFreeTime("Sunday"),
+
+            monday:
+                getFreeTime("Monday"),
+
+            tuesday:
+                getFreeTime("Tuesday"),
+
+            wednesday:
+                getFreeTime("Wednesday"),
+
+            note:
+                note
+
+        };
+
+
+        /* ================= SEND TO GOOGLE SHEET ================= */
+
+        try {
+
+            const formData =
+                new URLSearchParams();
+
+
+            formData.append(
+                "payload",
+                JSON.stringify(data)
+            );
+
+
+            const response =
+                await fetch(
+                    GOOGLE_SCRIPT_URL,
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            /* ================= DUPLICATE ================= */
+
+            if (
+                result.duplicate === true
+            ) {
+
+                submitBtn.disabled =
+                    false;
+
+                submitBtn.innerText =
+                    "Submit Availability";
+
+
+                alert(
+                    "This Student ID has already submitted.\n\n" +
+                    "One Student ID can submit only once."
+                );
+
+
+                return;
+            }
+
+
+            /* ================= SUCCESS ================= */
+
+            if (
+                result.success === true
+            ) {
+
+                /*
+                 * Reset everything
+                 */
+                resetForm();
+
+
+                /*
+                 * Show success popup
+                 */
+                showSuccessMessage();
+
+
+                /*
+                 * No countdown
+                 */
+                submitBtn.innerText =
+                    "Submitted ✓";
+
+
+                submitBtn.style.background =
+                    "#16a34a";
+
+
+                return;
+            }
+
+
+            throw new Error(
+                result.message ||
+                "Submission failed."
+            );
+
+        }
+
+
+        /* ================= ERROR ================= */
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            alert(
+                "Submission failed.\n\n" +
+                error.message
+            );
+
+
+            submitBtn.disabled =
+                false;
+
+
+            submitBtn.innerText =
+                "Submit Availability";
+
+        }
 
     }
-
-});
+);
 
 
 /* ================= RESET FORM ================= */
 
 function resetForm() {
 
-    /* Clear student information */
+    /* Clear Name */
 
-    document.getElementById("name").value = "";
-
-    document.getElementById("studentId").value = "";
-
-    document.getElementById("department").value = "";
-
-    document.getElementById("phone").value = "";
-
-    document.getElementById("note").value = "";
+    document.getElementById(
+        "name"
+    ).value = "";
 
 
-    /* Clear selected class slots */
+    /* Clear Student ID */
 
-    const selectedSlots =
-        document.querySelectorAll(".slot.selected");
+    document.getElementById(
+        "studentId"
+    ).value = "";
 
-    selectedSlots.forEach(slot => {
 
-        slot.classList.remove("selected");
+    /* Clear Department */
 
-    });
+    document.getElementById(
+        "department"
+    ).value = "";
+
+
+    /* Clear Phone */
+
+    document.getElementById(
+        "phone"
+    ).value = "";
+
+
+    /* Clear Note */
+
+    document.getElementById(
+        "note"
+    ).value = "";
+
+
+    /* Remove selected class slots */
+
+    document
+        .querySelectorAll(
+            ".slot.selected"
+        )
+        .forEach(slot => {
+
+            slot.classList.remove(
+                "selected"
+            );
+
+        });
 
 
     /*
      * IMPORTANT:
-     * Recalculate available time AFTER
-     * removing all selected slots.
+     * Clear the available-time section.
+     *
+     * We DO NOT call calculateFreeTime()
+     * here, because that would show all
+     * time slots again.
      */
 
-    calculateFreeTime();
+    document.getElementById(
+        "freeTime"
+    ).innerHTML = "";
 
 }
 
 
-/* ================= SUCCESS MESSAGE ================= */
+/* ================= SUCCESS POPUP ================= */
 
 function showSuccessMessage() {
 
     const modal =
-        document.getElementById("successModal");
+        document.getElementById(
+            "successModal"
+        );
+
 
     if (modal) {
 
-        modal.style.display = "flex";
+        modal.style.display =
+            "flex";
 
     }
 
 }
 
 
-/* ================= CLOSE MODAL ================= */
+/* ================= CLOSE POPUP ================= */
 
 function closeModal() {
 
     const modal =
-        document.getElementById("successModal");
+        document.getElementById(
+            "successModal"
+        );
+
 
     if (modal) {
 
-        modal.style.display = "none";
+        modal.style.display =
+            "none";
 
     }
 
